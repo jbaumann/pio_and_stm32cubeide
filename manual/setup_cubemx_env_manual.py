@@ -33,10 +33,13 @@ build_flags = [
     "-mfloat-abi=hard",
     "-mfpu=fpv4-sp-d16",
 ]
-cc_only_flags = [
-    "--specs=nano.specs",
-#    "--specs=nosys.specs",
-]
+# additional flags for the compiler only
+#cc_only_flags = [
+    # These are already set by platformio, see
+    # PIO_FRAMEWORK_ARDUINO_STANDARD_LIB
+    #"--specs=nano.specs",
+    #"--specs=nosys.specs",
+#]
 
 
 ####################################
@@ -77,6 +80,6 @@ if not 'BUILD_FLAGS' in env:
 env['BUILD_FLAGS'] += ['-I' + include_dir for include_dir in include_dirs]
 
 # Add the necessary build flags to compiler and linker flags. 
-env['BUILD_FLAGS'] += cc_only_flags
+#env['BUILD_FLAGS'] += cc_only_flags
 env['BUILD_FLAGS'] += build_flags
 env["LINKFLAGS"] += build_flags
