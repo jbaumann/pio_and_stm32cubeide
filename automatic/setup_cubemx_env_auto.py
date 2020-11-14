@@ -27,7 +27,7 @@ except IOError as error:
 
 # In these lists we collect our directories
 src_dirs = set()
-include_dirs = set()
+include_dirs = []
 
 #################################################
 # read the source directories from .cproject
@@ -35,7 +35,7 @@ include_dirs = set()
 #################################################
 cubemx_directories = set()
 
-config = root.find(".//configuration[@name='Release']")
+config = root.find(".//configuration[@name='Debug']")
 
 for source_entry in config.findall("sourceEntries/entry"):
 	directory = source_entry.get('name')
@@ -65,11 +65,11 @@ for cubemx_dir in cubemx_directories:
 #################################################
 tool_chain = config.find("./folderInfo/toolChain")
 
-for include_entry in tool_chain.findall(".//option[@valueType='includePath']/listOptionValue"):
+for include_entry in tool_chain.findall(".//option[@superClass='com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.includepaths']/listOptionValue"):
 	inc_dir = include_entry.get('value')
 	if inc_dir != "../Core/Inc":
 		inc_dir = inc_dir.replace("../", "-I", 1)
-		include_dirs.add(inc_dir)
+		include_dirs.append(inc_dir)
 if not include_dirs:
 	raise SCons.Errors.BuildError(
             errstr="%s Error: Cannot read include directories from project file "
