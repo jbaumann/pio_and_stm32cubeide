@@ -9,9 +9,9 @@ The scripts provided here change that. One script is configured manually, and yo
 1. In STM32CubeIDE create a new project with the target and needed middleware. Configure your uC to your liking and let the IDE generate the source files. Use "Copy only necessary library files".
 2. Change to the project directory and execute the following command (you can do this in your normal shell or the VSCode environment depending on your configuration).
 
-`pio init --<your board config> --project-option "framework=stm32cube"`
+`platformio init --board <your board config> --project-option "framework=stm32cube"`
 
-3. PlatformIO creates additional folders which you can delete.
+3. PlatformIO creates additional folders most of which you probably can delete (include, lib, src, test...). I would keep them, they don't need that much space...
 4. Open platformio.ini. Change the `src_dir` and the `include_dir` in the [platformio] section.
 5. Copy one of the setup scripts to your project directory.
 6. Add the script to your board environment. Either use the manual script or the automatic script with the following line (example contains the automatic script):
