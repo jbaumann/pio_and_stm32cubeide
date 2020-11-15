@@ -18,8 +18,6 @@ The scripts provided here change that. One script is configured manually, and yo
 
 `extra_scripts = pre:setup_cubemx_env_auto.py`
 
-6. If you use the automatic script you are done and can run your first compilation. If you use the manual script, then you have to edit it and adjust the directories that the STM32CubeIDE has created and adjust the build flags. You can find the build flags in the project configuration tab in the STM32CubeIDE.
-
 For reference see the provided sample platformio.ini which you can use as the basis for your own.
 
 # Further information
