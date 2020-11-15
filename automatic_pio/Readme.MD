@@ -1,4 +1,4 @@
-# Integration of PlatformIO and STM32CubeIDE
+# The Automatic Script using PIO Libraries
 
 Developing for STM32 until now provided 2 major and distinct paths: Either you use STM32CubeIDE with the manufacturer support or you use PlatformIO with its unique way of supporting developers.
 
