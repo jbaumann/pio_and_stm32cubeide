@@ -35,16 +35,19 @@ The script does quite a few things to ensure that platformio behaves. It tries t
 
 6. Copy script `setup_cubemx_env_auto.py` to your project directory.
 
+7. Rename any assembler files having a lower-case '.s' ending to upper-case '.S'. Otherwise you get an error "unrecognized option -x". The script points out the paths to any files that you have not yet renamed. STM32CubeIDE has no problems with this simple renaming.
+
 For reference see the provided sample platformio.ini which you can use as the basis for your own.
 
 # Details
 
-framework is deleted
-.s to .S
-linked resources 
+Here are a few unordered details that might help you understand the inner workings of the script.
 
-You actually can skip this step and simply place the platformio.ini file into the directory and create the lib directory.
+It doesn't really matter which framework you select because one of the steps to ensure that no Platformio libraries are used is to remove the framework from the build model before handing over to Platformio's build script.
 
+The directory provided in lib_deps is created anew with each build. Here the script collects actual links to every "linked resource" found in the .project file by STM32CubeIDE. This is why it is important to choose the option "Add necessary files as reference in the toolchain project configuration file".
+
+You actually do not have to call "platformio init". Instead you can simply copy the provided platformio.ini, correct the board definition and create the lib directory. Even the lib directory doesn't have to be created. If the lib directory is not found the script prints a warning and creates the directory anyway.
 
 # Further information
 
