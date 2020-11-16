@@ -51,6 +51,8 @@ The directory provided in lib_deps is created anew with each build. Here the scr
 
 You actually do not have to call "platformio init". Instead you can simply copy the provided platformio.ini, correct the board definition and create the lib directory. Even the lib directory doesn't have to be created. If the lib directory is not found the script prints a warning and creates the directory anyway.
 
+If you forgot to select `"Add necessary files as reference in the toolchain project configuration file"` when creating your project (or when working on an already existing project) you can change this setting in the project's `.ioc` file. Go to the `Project Manager` tab, select `Code Generator` on the left side, and there you have the opportunity to select this option on a project that has so far been configured differently.
+
 # Performance Considerations
 
 The script changes a lot of information in platformio, but it reads only two files that it parses as XML and creates the links to the library files needed. Comparing this to the LDF which parses each source file to determine needed include files this is not much. And since we can assume that after the links are created, they are staying in the filesystem cache for a while, the following execution of the LDF will be that much faster, so in fact we won't lose much time at all through the link creation.
