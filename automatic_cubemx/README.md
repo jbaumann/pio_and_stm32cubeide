@@ -51,6 +51,14 @@ The directory provided in lib_deps is created anew with each build. Here the scr
 
 You actually do not have to call "platformio init". Instead you can simply copy the provided platformio.ini, correct the board definition and create the lib directory. Even the lib directory doesn't have to be created. If the lib directory is not found the script prints a warning and creates the directory anyway.
 
+# Performance Considerations
+
+The script changes a lot of information in platformio, but it reads only two files that it parses as XML and creates the links to the library files needed. Comparing this to the LDF which parses each source file to determine needed include files this is not much. And since we can assume that after the links are created, they are staying in the filesystem cache for a while, the following execution of the LDF will be that much faster, so in fact we won't lose much time through the link creation.
+
+What remains is parsing the two project files which are typically both less than 100KB. The time to parse these and build the XML object tree should be negligible. If we assume a doubling in size when creating the xml object tree, we are still shy of 500KB in-mem representation. This might sound like quite a lot, but since we run the script on the machine on which we build the project we can assume that this should be no problem.
+
+TLDR; Running the script should not have a relevant influence on the overall build time.
+
 # Further information
 
 Since this script has been tested only with a limited set of boards I would be very interested in your feedback, whether positive or negative.
