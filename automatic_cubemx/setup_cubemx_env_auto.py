@@ -21,12 +21,18 @@ lib_directory = "lib/"
 
 # The project option containing the directory in which CubeMX resides
 try:
-	repository_location = path.expanduser(
-		env.GetProjectOption("custom_repo_location"))
+	repository_location = env.GetProjectOption("custom_repo_location")
 except:
-	raise SCons.Errors.BuildError(
-		errstr="%s Error: The option 'custom_repo_location' is not set"
-		% log_name)
+	repository_location = "~"
+	pass
+
+# set the project source dir
+env["PROJECT_SRC_DIR"] = path.abspath("./")
+
+repository_location=path.expanduser(repository_location)
+print("%s: Using the following repository location: '%s'"
+		% (log_name, repository_location))
+
 # We simply take the first extra library dependency
 try:
 	linked_resources_dir = lib_directory + env.GetProjectOption("lib_deps")[0]
