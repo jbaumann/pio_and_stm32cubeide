@@ -53,6 +53,8 @@ You actually do not have to call "platformio init". Instead you can simply copy 
 
 If you forgot to select `"Add necessary files as reference in the toolchain project configuration file"` when creating your project (or when working on an already existing project) you can change this setting in the project's `.ioc` file. Go to the `Project Manager` tab, select `Code Generator` on the left side, and there you have the opportunity to select this option on a project that has so far been configured differently.
 
+You can check that the linked resources have been added either by examining the .project file or by opening the project properties (right click on the project, menu entry at the bottom), then `Linked Resources->Linked Resoures`. There all the linked library files should be listed.
+
 # Performance Considerations
 
 The script changes a lot of information in platformio, but it reads only two files that it parses as XML and creates the links to the library files needed. Comparing this to the LDF which parses each source file to determine needed include files this is not much. And since we can assume that after the links are created, they are staying in the filesystem cache for a while, the following execution of the LDF will be that much faster, so in fact we won't lose much time at all through the link creation.
