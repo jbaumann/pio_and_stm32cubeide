@@ -173,7 +173,7 @@ for option in tool_chain.findall("option[@valueType='enumerated']"):
 	m_flags += ['-m%s=%s' % (m_flag, value)]
 
 build_flags += m_flags
-print("%s: Using the following build flags: '%s'"
+print("%s: Adding the following build flags: '%s'"
       % (log_name, ', '.join(build_flags)))
 
 # additional flags for the compiler only
