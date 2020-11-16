@@ -53,7 +53,7 @@ You actually do not have to call "platformio init". Instead you can simply copy 
 
 # Performance Considerations
 
-The script changes a lot of information in platformio, but it reads only two files that it parses as XML and creates the links to the library files needed. Comparing this to the LDF which parses each source file to determine needed include files this is not much. And since we can assume that after the links are created, they are staying in the filesystem cache for a while, the following execution of the LDF will be that much faster, so in fact we won't lose much time through the link creation.
+The script changes a lot of information in platformio, but it reads only two files that it parses as XML and creates the links to the library files needed. Comparing this to the LDF which parses each source file to determine needed include files this is not much. And since we can assume that after the links are created, they are staying in the filesystem cache for a while, the following execution of the LDF will be that much faster, so in fact we won't lose much time at all through the link creation.
 
 What remains is parsing the two project files which are typically both less than 100KB. The time to parse these and build the XML object tree should be negligible. If we assume a doubling in size when creating the xml object tree, we are still shy of 500KB in-mem representation. This might sound like quite a lot, but since we run the script on the machine on which we build the project we can assume that this should be no problem.
 
