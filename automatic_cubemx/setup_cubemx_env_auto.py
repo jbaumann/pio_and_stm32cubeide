@@ -1,4 +1,5 @@
 # Author: Joachim Baumann
+# Version: 1.0.1
 #
 # This script is based on the information for advanced scripting provided
 # by platformio
@@ -66,15 +67,18 @@ if not path.exists(lib_directory):
 mkdir(linked_resources_dir)
 
 for linked_resource in project_root.findall(".//linkedResources/link/locationURI"):
-	resource = re.sub(r"\$%7B.*%7D", repository_location, linked_resource.text)
+	resource = re.sub(r"\$%7B.*%7D", "", linked_resource.text)
+	if not resource.startswith(repository_location):
+		resource = repository_location + resource
 	try:
 		resource_name = path.basename(resource)
 		link_name = linked_resources_dir + "/" + resource_name
-		symlink(resource, linked_resources_dir + "/" + resource_name)
+		symlink(resource, link_name)
 	except OSError:
+		print(resource_name)
 		raise SCons.Errors.BuildError(
-            errstr="%s Error: Cannot create symlink in directory '%s'"
-            % (log_name, linked_resources_dir))
+                    errstr="%s Error: Cannot create symlink in directory '%s'"
+                    % (log_name, linked_resources_dir))
 
 #################################################
 # Open the .cproject file and parse it as XML
