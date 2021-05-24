@@ -12,7 +12,7 @@ The script does quite a few things to ensure that platformio behaves. It tries t
 
 1. In STM32CubeIDE create a new project with the target and needed middleware. Configure your uC to your liking and let the IDE generate the source files. Use 
 `"Add necessary files as reference in the toolchain project configuration file"`. 
-This is extremely important because this is the only way that the script can derivce the used library files (this data is stored in the .project file).
+This is extremely important because this is the only way that the script can derive the used library files (this data is stored in the .project file).
 
 2. Change to the project directory and execute the following command (you can do this in your normal shell or the VSCode environment depending on your configuration).
 
