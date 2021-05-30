@@ -153,6 +153,7 @@ for include_entry in tool_chain.findall(".//option[@superClass='com.st.stm32cube
     # add project-related paths e.g., Middleware-directores
     inc_dir = re.sub(
         '"\$\{workspace_loc:/\$\{ProjName\}(.*)}"', ws_replacement, inc_dir)
+    # Fix references to Core
     inc_dir = inc_dir.replace("../", "", 1)
     # print(inc_dir)
     inc_dir = "-I" + inc_dir
@@ -188,8 +189,10 @@ for option in tool_chain.findall("option[@valueType='enumerated']"):
     value = option.get("value").replace(superClass + ".value.", "")
     m_flag = superClass.replace(
         "com.st.stm32cube.ide.mcu.gnu.managedbuild.option.", "")
+    # If the eclipse notation of the flag differs we correct that
     if m_flag in option_mapping:
         m_flag = option_mapping[m_flag]
+    # Add the flag to the list of flags
     m_flags += ['-m%s=%s' % (m_flag, value)]
 
 build_flags += m_flags
