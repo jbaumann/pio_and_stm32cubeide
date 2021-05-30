@@ -1,5 +1,5 @@
 # Author: Joachim Baumann
-# Version: 1.0.1
+# Version: 1.0.2
 #
 # This script is based on the information for advanced scripting provided
 # by platformio
@@ -65,8 +65,18 @@ if not path.exists(lib_directory):
     mkdir(lib_directory)
 mkdir(linked_resources_dir)
 
-for linked_resource in project_root.findall(".//linkedResources/link/locationURI"):
-    resource = re.sub(r"PARENT-\d+-PROJECT_LOC", "", linked_resource.text)
+# Collect the virtual dirs so that we later know not to add them
+virtual_dirs = []
+for linked_resource in project_root.findall(".//linkedResources/link"):
+    # Retrieve the complete link
+    linkedName = linked_resource.find(".//name").text
+    linkedURI = linked_resource.find(".//locationURI").text
+    # It's a virtual folder?
+    if linkedURI == "virtual:/virtual":
+        # Add to virtual_dirs in case of virtual folder
+        virtual_dirs.append(linkedName)
+        continue
+    resource = re.sub(r"PARENT-\d+-PROJECT_LOC", "", linkedURI)
     if not resource.startswith(repository_location):
         resource = repository_location + resource
     try:
@@ -105,7 +115,9 @@ config = cproject_root.find(".//configuration[@name='Debug']")
 for source_entry in config.findall("sourceEntries/entry"):
     directory = source_entry.get('name')
     if directory != "Core":
-        cubemx_directories.add(directory)
+        # Add non-virtual folders
+        if directory not in virtual_dirs:
+            cubemx_directories.add(directory)
 if cubemx_directories:
     print("%s: Using the following source directories: 'Core, %s'"
           % (log_name, ', '.join(cubemx_directories)))
@@ -134,8 +146,8 @@ for cubemx_dir in cubemx_directories:
 #################################################
 tool_chain = config.find("./folderInfo/toolChain")
 
-ws_replacement = env["PROJECT_SRC_DIR"] + '/\\1'
-print(ws_replacement)
+ws_replacement = re.escape(env["PROJECT_SRC_DIR"]) + '/\\1'
+
 for include_entry in tool_chain.findall(".//option[@superClass='com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.includepaths']/listOptionValue"):
     inc_dir = include_entry.get('value')
     # add project-related paths e.g., Middleware-directores
