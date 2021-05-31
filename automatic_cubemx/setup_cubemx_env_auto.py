@@ -21,18 +21,17 @@ log_name = "SETUP_CUBEMX"
 lib_directory = "lib/"
 
 # The project option containing the directory in which CubeMX resides
-try:
-    repository_location = env.GetProjectOption("custom_repo_location")
-except:
-    repository_location = "~"
-    pass
+# try:
+#    repository_location = env.GetProjectOption("custom_repo_location")
+# except:
+#    repository_location = "~"
+#    pass
+#repository_location = path.expanduser(repository_location)
+# print("%s: Using the following repository location: '%s'"
+#      % (log_name, repository_location))
 
 # set the project source dir
-env["PROJECT_SRC_DIR"] = path.abspath("./")
-
-repository_location = path.expanduser(repository_location)
-print("%s: Using the following repository location: '%s'"
-      % (log_name, repository_location))
+env["PROJECT_SRC_DIR"] = project_dir
 
 # We simply take the first extra library dependency
 try:
@@ -76,9 +75,21 @@ for linked_resource in project_root.findall(".//linkedResources/link"):
         # Add to virtual_dirs in case of virtual folder
         virtual_dirs.append(linkedName)
         continue
-    resource = re.sub(r"PARENT-\d+-PROJECT_LOC", "", linkedURI)
-    if not resource.startswith(repository_location):
-        resource = repository_location + resource
+    # It's a relative path?
+    m = re.match("PARENT-(\d+)-PROJECT_LOC(.*)$", linkedURI)
+    if m is not None:
+        parent_level = int(m.group(1))
+        current_dir = project_dir
+        for i in range(parent_level):
+            current_dir = current_dir + "/.."
+        resource = path.abspath(current_dir + m.group(2))
+        print(resource)
+    else:
+        # we have a path type that we haven't seen yet
+        raise SCons.Errors.BuildError(
+            errstr="%s Error: Unexpected relative path type '%s'"
+            % (log_name, linkedURI))
+
     try:
         resource_name = path.basename(resource)
         link_name = linked_resources_dir + "/" + resource_name
@@ -146,7 +157,7 @@ for cubemx_dir in cubemx_directories:
 #################################################
 tool_chain = config.find("./folderInfo/toolChain")
 
-ws_replacement = re.escape(env["PROJECT_SRC_DIR"]) + '/\\1'
+ws_replacement = re.escape(project_dir) + '/\\1'
 
 for include_entry in tool_chain.findall(".//option[@superClass='com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.includepaths']/listOptionValue"):
     inc_dir = include_entry.get('value')
