@@ -83,7 +83,7 @@ for linked_resource in project_root.findall(".//linkedResources/link"):
         for i in range(parent_level):
             current_dir = current_dir + "/.."
         resource = path.abspath(current_dir + m.group(2))
-        print(resource)
+        # print(resource)
     else:
         # we have a path type that we haven't seen yet
         raise SCons.Errors.BuildError(
