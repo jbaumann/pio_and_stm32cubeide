@@ -79,9 +79,7 @@ for linked_resource in project_root.findall(".//linkedResources/link"):
     m = re.match("PARENT-(\d+)-PROJECT_LOC(.*)$", linkedURI)
     if m is not None:
         parent_level = int(m.group(1))
-        current_dir = project_dir
-        for i in range(parent_level):
-            current_dir = current_dir + "/.."
+        current_dir = project_dir + "/.." * parent_level
         resource = path.abspath(current_dir + m.group(2))
         # print(resource)
     else:
@@ -185,6 +183,16 @@ build_flags = [
     # we always choose thumb mode with STM32
     "-mthumb",
 ]
+# additional flags for the compiler only
+cc_only_flags = [
+    # These are set by platformio, see
+    # PIO_FRAMEWORK_ARDUINO_STANDARD_LIB
+    # additional ones can be added using build flags
+]
+
+# additional flags for the linker only
+ld_only_flags = [
+]
 
 # extract the cpu type from the board
 board_config = env.BoardConfig()
@@ -195,6 +203,10 @@ m_flags = ['-mcpu=%s' % cpu]
 option_mapping = {
     "floatabi": "float-abi",
 }
+cc_only_option_mapping = {
+    "runtimelibrary_c"
+}
+
 for option in tool_chain.findall("option[@valueType='enumerated']"):
     superClass = option.get("superClass")
     value = option.get("value").replace(superClass + ".value.", "")
@@ -204,23 +216,15 @@ for option in tool_chain.findall("option[@valueType='enumerated']"):
     if m_flag in option_mapping:
         m_flag = option_mapping[m_flag]
     # Add the flag to the list of flags
-    m_flags += ['-m%s=%s' % (m_flag, value)]
+    if m_flag in cc_only_option_mapping:
+        print("Removing %s=%s" % (mflag, value))
+    else:
+        m_flags += ['-m%s=%s' % (m_flag, value)]
 
 build_flags += m_flags
 print("%s: Adding the following build flags: '%s'"
       % (log_name, ', '.join(build_flags)))
 
-# additional flags for the compiler only
-cc_only_flags = [
-    # These are already set by platformio, see
-    # PIO_FRAMEWORK_ARDUINO_STANDARD_LIB
-    # "--specs=nano.specs",
-    # "--specs=nosys.specs",
-]
-
-# additional flags for the linker only
-ld_only_flags = [
-]
 
 #################################################
 # Get the ld script from .cproject
