@@ -25,10 +25,6 @@ This is extremely important because this is the only way that the script can der
 
 `extra_scripts = pre:setup_cubemx_env_auto.py`
 
-`;The project option containing the directory in which CubeMX resides`
-
-`custom_repo_location = ~`
-
 `; The name of the library directory in which the linked resources will`
 
 `; be placed`
@@ -38,6 +34,8 @@ This is extremely important because this is the only way that the script can der
 6. Copy script `setup_cubemx_env_auto.py` to your project directory.
 
 7. Rename any assembler files having a lower-case '.s' ending to upper-case '.S'. Otherwise you get an error "unrecognized option -x". The script points out the paths to any files that you have not yet renamed. STM32CubeIDE has no problems with this simple renaming.
+
+9. Decide on the C library you want to use. If you choose Nano, then everything is setup already. Other possible libraries can be chosen by setting build variables. You can find the details [here](https://docs.platformio.org/en/latest/platforms/ststm32.html#stm32duino-configuration-system).
 
 For reference see the provided sample platformio.ini which you can use as the basis for your own.
 
