@@ -217,7 +217,7 @@ for option in tool_chain.findall("option[@valueType='enumerated']"):
         m_flag = option_mapping[m_flag]
     # Add the flag to the list of flags
     if m_flag in cc_only_option_mapping:
-        print("Removing %s=%s" % (mflag, value))
+        print("Removing %s=%s" % (m_flag, value))
     else:
         m_flags += ['-m%s=%s' % (m_flag, value)]
 
