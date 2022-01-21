@@ -229,12 +229,20 @@ print("%s: Adding the following build flags: '%s'"
 #################################################
 # Get the ld script from .cproject
 #################################################
-ld_script_entry = tool_chain.find(
-    "tool[@name='MCU GCC Linker']/option").get("value")
 
-ld_script = re.search(
-    '\$\{workspace_loc:/\$\{ProjName\}/(.+)\}', ld_script_entry)
-if ld_script != None:
+# The GCC linker entries
+ld_script_entry = tool_chain.find("tool[@name='MCU GCC Linker']/option")
+if ld_script_entry == None:
+    # The G++ linker entries
+    ld_script_entry = tool_chain.find("tool[@name='MCU G++ Linker']/option")
+
+ld_script = None
+if ld_script_entry != None:
+    ld_script_entry = ld_script_entry.get("value")
+    ld_script = re.search(
+        '\$\{workspace_loc:/\$\{ProjName\}/(.+)\}', ld_script_entry)
+
+if ld_script_entry != None and ld_script != None:
     ld_script = ld_script.group(1)
 else:
     # How do I send a warning to platformio?
