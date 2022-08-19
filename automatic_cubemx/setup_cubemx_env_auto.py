@@ -10,7 +10,7 @@
 # own board definition to glean the cpu type.
 
 import shutil
-from os import mkdir, path, symlink, walk
+from os import mkdir, path, rename, symlink, walk
 import SCons.Errors
 import xml.etree.ElementTree as ET
 import re
@@ -146,9 +146,10 @@ for cubemx_dir in cubemx_directories:
             if file.endswith(('.c', '.cpp', '.s', '.S')):
                 src_dirs.add('+<%s/>' % dirpath)
                 if file.endswith('.s'):
-                    print("%s: file '%s/%s'" % (log_name, dirpath, file))
-                    print(" - lower case ending for assembler file might lead"
-                          " to error \"unrecognized option '-x'\"")
+                    # silently convert it to upper case :)
+                    fn = path.abspath(path.join(dirpath, file))
+                    rename(fn, fn + "S")
+                    rename(fn + "S", fn[:-1] + "S")
 
 #################################################
 # now read the include dirs from .cproject
@@ -277,4 +278,4 @@ if ld_script != None:
     env["LDSCRIPT_PATH"] = ld_script
 
 # Remove the framwork from the environment
-del env['PIOFRAMEWORK']
+    del env['PIOFRAMEWORK']
