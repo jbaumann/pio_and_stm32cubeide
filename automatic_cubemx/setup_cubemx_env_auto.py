@@ -278,4 +278,5 @@ if ld_script != None:
     env["LDSCRIPT_PATH"] = ld_script
 
 # Remove the framwork from the environment
+if 'PIOFRAMEWORK' in env:
     del env['PIOFRAMEWORK']
