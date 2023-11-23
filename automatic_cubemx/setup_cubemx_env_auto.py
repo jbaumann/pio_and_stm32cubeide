@@ -70,10 +70,9 @@ for linked_resource in project_root.findall(".//linkedResources/link"):
     # Retrieve the complete link
     linkedName = linked_resource.find(".//name").text
     # with STMCubeIDE 1.13.2 the name changed from "locationURI" to "location"
-    linkedNode = linked_resource.find(".//locationURI").text
+    linkedNode = linked_resource.find(".//locationURI")
     if linkedNode is None:
-        linkedNode = linked_resource.find(".//location").text
-
+        linkedNode = linked_resource.find(".//location")
 
     linkedURI = linkedNode.text
     # It's a virtual folder?
