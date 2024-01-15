@@ -4,7 +4,7 @@ Developing for STM32 until now provided 2 major and distinct paths: Either you u
 
 The script provided here offers a middleground, using the source from the STM32CubeIDE combined with the CubeMX libraries provided by platformio. 
 
-Warning: These are outdated and kept as a reference only.
+**Warning: This approach is outdated and kept as a reference only.**
 
 # Steps to use the scripts
 
