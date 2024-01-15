@@ -10,10 +10,10 @@ This is the preferred way to build (mine anyways). The .project and .cproject fi
 
 ## Automatic PIO
 
-This automatic script tries to derive the necessary information from the project's .cproject file, sets up everything and the lets Platformio build using the CubeMX libraries that it provides. These are outdated and kept as a reference only.
+This automatic script tries to derive the necessary information from the project's .cproject file, sets up everything and the lets Platformio build using the CubeMX libraries that it provides. This approach is outdated and kept as a reference only.
 
 ## Manual
 
 This manual script is heavily influenced by the following script: https://community.platformio.org/t/using-stm32cubemx-and-platformio/2611/57
 
-You configure everything from hand at the top of the script and the build is done using the CubeMX libraries that Platformio provides. These are outdated and kept as a reference only.
+You configure everything from hand at the top of the script and the build is done using the CubeMX libraries that Platformio provides. This approach is outdated and kept as a reference only.
