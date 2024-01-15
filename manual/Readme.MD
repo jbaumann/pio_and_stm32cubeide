@@ -2,7 +2,9 @@
 
 Developing for STM32 until now provided 2 major and distinct paths: Either you use STM32CubeIDE with the manufacturer support or you use PlatformIO with its unique way of supporting developers.
 
-The script provided here offers a middleground, using the source from the STM32CubeIDE combined with the CubeMX libraries provided by platformio. These are not updated as often as one might wish for, but ymmv.
+The script provided here offers a middleground, using the source from the STM32CubeIDE combined with the CubeMX libraries provided by platformio.
+
+**Warning: This approach is outdated and kept as a reference only.**
 
 # Steps to use the script
 
