@@ -10,7 +10,7 @@
 # own board definition to glean the cpu type.
 
 import shutil
-from os import mkdir, path, rename, symlink, walk
+from os import mkdir, path, rename, symlink, walk, listdir, unlink
 import SCons.Errors
 import xml.etree.ElementTree as ET
 import re
@@ -35,7 +35,8 @@ env["PROJECT_SRC_DIR"] = project_dir
 
 # We simply take the first extra library dependency
 try:
-    linked_resources_dir = lib_directory + env.GetProjectOption("lib_deps")[0]
+    linked_resources_dir = path.join(
+        lib_directory, env.GetProjectOption("lib_deps")[0])
 except:
     raise SCons.Errors.BuildError(
         errstr="%s Error: The option 'lib_deps' is not set"
@@ -52,17 +53,27 @@ except IOError as error:
         % (log_name, project_dir))
 
 # Delete the folder STLinkedResources
-try:
-    shutil.rmtree(linked_resources_dir)
-except FileNotFoundError:
-    pass
+# try:
+#    shutil.rmtree(linked_resources_dir)
+# except FileNotFoundError:
+#    pass
 
 # now create the directory and link all the needed files
 if not path.exists(lib_directory):
     print("%s: Warning - Directory '%s' doesn't exist. Did you initialize platformio?"
           % (log_name, lib_directory))
     mkdir(lib_directory)
-mkdir(linked_resources_dir)
+
+if not path.exists(linked_resources_dir):
+    mkdir(linked_resources_dir)
+
+# Get existing resources
+linked_resource_dict = {}
+if path.exists(linked_resources_dir):
+    items = listdir(linked_resources_dir)
+    for f in items:
+        if not path.isdir(f):
+            linked_resource_dict[f] = True
 
 # Collect the virtual dirs so that we later know not to add them
 virtual_dirs = []
@@ -95,13 +106,26 @@ for linked_resource in project_root.findall(".//linkedResources/link"):
 
     try:
         resource_name = path.basename(resource)
-        link_name = linked_resources_dir + "/" + resource_name
-        symlink(resource, link_name)
+        link_name = path.join(linked_resources_dir, resource_name)
+
+        # if symlink already created previously, 
+        # remove entry from dicitonary
+        if resource_name in linked_resource_dict:
+            del linked_resource_dict[resource_name]
+        else:
+            # create symlink
+            symlink(resource, link_name)
     except OSError:
         print(resource_name)
         raise SCons.Errors.BuildError(
             errstr="%s Error: Cannot create symlink in directory '%s'"
             % (log_name, linked_resources_dir))
+
+# Remove previously linked resources that are disappeared
+for name in linked_resource_dict:
+    link_name = path.join(linked_resources_dir, name)
+    unlink(link_name)
+
 
 #################################################
 # Open the .cproject file and parse it as XML
