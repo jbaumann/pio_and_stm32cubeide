@@ -10,7 +10,7 @@
 # own board definition to glean the cpu type.
 
 import shutil
-from os import mkdir, path, rename, symlink, walk, listdir, unlink
+from os import mkdir, makedirs, path, rename, symlink, walk, listdir, unlink
 import SCons.Errors
 import xml.etree.ElementTree as ET
 import re
@@ -52,12 +52,6 @@ except IOError as error:
         errstr="%s Error: Cannot open project file .project in directory '%s'"
         % (log_name, project_dir))
 
-# Delete the folder STLinkedResources
-# try:
-#    shutil.rmtree(linked_resources_dir)
-# except FileNotFoundError:
-#    pass
-
 # now create the directory and link all the needed files
 if not path.exists(lib_directory):
     print("%s: Warning - Directory '%s' doesn't exist. Did you initialize platformio?"
@@ -67,17 +61,22 @@ if not path.exists(lib_directory):
 if not path.exists(linked_resources_dir):
     mkdir(linked_resources_dir)
 
+third_party_includes = set()
+
 # Get existing resources
 linked_resource_dict = {}
 if path.exists(linked_resources_dir):
     items = listdir(linked_resources_dir)
     for f in items:
         if not path.isdir(f):
+            # print(f)
             linked_resource_dict[f] = True
 
 # Collect the virtual dirs so that we later know not to add them
 virtual_dirs = []
 for linked_resource in project_root.findall(".//linkedResources/link"):
+    # Needed for Third Party directories
+    lib_target_dir = None
     # Retrieve the complete link
     linkedName = linked_resource.find(".//name").text
     # with STMCubeIDE 1.13.2 the name changed from "locationURI" to "location"
@@ -86,18 +85,32 @@ for linked_resource in project_root.findall(".//linkedResources/link"):
         linkedNode = linked_resource.find(".//location")
 
     linkedURI = linkedNode.text
-    # It's a virtual folder?
+    # It is a virtual folder?
     if linkedURI == "virtual:/virtual":
         # Add to virtual_dirs in case of virtual folder
         virtual_dirs.append(linkedName)
         continue
-    # It's a relative path?
+    # It is a relative path?
     m = re.match("PARENT-(\d+)-PROJECT_LOC(.*)$", linkedURI)
     if m is not None:
         parent_level = int(m.group(1))
         current_dir = project_dir + "/.." * parent_level
         resource = path.abspath(current_dir + m.group(2))
-        # print(resource)
+ 
+        # Third_Party signals that we might need the directory structure
+        if "Third_Party" in resource:
+            # print(resource)
+            m = re.match("^.*/Third_Party/(.+)/", resource)
+            lib_target_dir = path.join(linked_resources_dir, m.group(1))
+            (tp_dir, tp_file) = path.split(resource)
+            third_party_includes.add(tp_dir)
+            try:
+                makedirs(lib_target_dir)
+            except Exception as e:
+                # ignore errors
+                pass
+                
+
     else:
         # we have a path type that we haven't seen yet
         raise SCons.Errors.BuildError(
@@ -106,22 +119,27 @@ for linked_resource in project_root.findall(".//linkedResources/link"):
 
     try:
         resource_name = path.basename(resource)
-        link_name = path.join(linked_resources_dir, resource_name)
+        if lib_target_dir:
+            link_name = path.join(lib_target_dir, resource_name)
+        else:
+            link_name = path.join(linked_resources_dir, resource_name)
 
         # if symlink already created previously, 
-        # remove entry from dicitonary
+        # remove entry from dictionary
         if resource_name in linked_resource_dict:
             del linked_resource_dict[resource_name]
         else:
             # create symlink
+            # print(link_name)
             symlink(resource, link_name)
     except OSError:
-        print(resource_name)
-        raise SCons.Errors.BuildError(
-            errstr="%s Error: Cannot create symlink in directory '%s'"
-            % (log_name, linked_resources_dir))
+        if "Third_Party" not in resource:
+            # print(resource)
+            raise SCons.Errors.BuildError(
+                errstr="%s Error: Cannot create symlink in directory '%s'"
+                % (log_name, linked_resources_dir))
 
-# Remove previously linked resources that are disappeared
+# Remove previously linked resources that have disappeared
 for name in linked_resource_dict:
     link_name = path.join(linked_resources_dir, name)
     unlink(link_name)
@@ -194,7 +212,9 @@ for include_entry in tool_chain.findall(".//option[@superClass='com.st.stm32cube
         '"\$\{workspace_loc:/\$\{ProjName\}(.*)}"', ws_replacement, inc_dir)
     # Fix references to Core
     inc_dir = inc_dir.replace("../", "", 1)
-    # print(inc_dir)
+    inc_dir = "-I" + inc_dir
+    include_dirs.append(inc_dir)
+for inc_dir in third_party_includes:
     inc_dir = "-I" + inc_dir
     include_dirs.append(inc_dir)
 if not include_dirs:
