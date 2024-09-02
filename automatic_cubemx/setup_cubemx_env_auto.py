@@ -285,6 +285,9 @@ ld_script_entry = tool_chain.find("tool[@name='MCU GCC Linker']/option")
 if ld_script_entry == None:
     # The G++ linker entries
     ld_script_entry = tool_chain.find("tool[@name='MCU G++ Linker']/option")
+    if ld_script_entry == None:
+        # Some versions of STM32CubeIDE use "MCU/MPU GCC Linker"
+        ld_script_entry = tool_chain.find("tool[@name='MCU/MPU GCC Linker']/option")
 
 ld_script = None
 if ld_script_entry != None:
